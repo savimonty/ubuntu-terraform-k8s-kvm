@@ -62,13 +62,12 @@ Allocation:     113.77 GiB
 Available:      508.82 GiB
 ```
 
-# Remember:
-Undefine pending domains after `$ terraform destroy`
+# Run the Terraform script
 ```
-$ sudo virsh list --all
-$ sudo virsh undefine <domain_name>
+$ terraform init
+$ sudo terraform plan
+$ sudo terraform apply -auto-approve
 ```
-# Terraform needs sudo
 
 # Post Terraform - Add Worker Nodes
 After the terraform scripts are completed, the nodes are now ready and their IP Addresses should be printed as outputs.
@@ -127,3 +126,14 @@ export KUBECONFIG="/home/savimonty/Projects/mine/terraform-k8s-kvm/k8s-builder/c
 
 Displaying Control Pane's Kube Config in VSCode in case you need it for Lens
 ```
+
+
+# Some caveats:
+If you run ctrl-c during apply .. 
+`Undefine` some pending domains that may remain after `$ terraform destroy`
+```
+$ sudo virsh list --all
+$ sudo virsh undefine <domain_name>
+```
+
+# Terraform needs sudo
