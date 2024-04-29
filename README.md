@@ -141,5 +141,3 @@ If you run ctrl-c during apply ..
 $ sudo virsh list --all
 $ sudo virsh undefine <domain_name>
 ```
-
-# Terraform needs sudo
