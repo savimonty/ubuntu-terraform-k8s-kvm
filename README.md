@@ -69,24 +69,30 @@ $ sudo terraform plan
 $ sudo terraform apply -auto-approve
 ```
 
+This should set up a 3 node cluster if KVM has been setup correctly.
+Modify the `main.tf` file to your heart's content to play around with the declarative aspects.
+
+`sudo` should not be needed after some tinkering with KVM/libvirt config and `usermod`.
+
 # Post Terraform - Add Worker Nodes
-After the terraform scripts are completed, the nodes are now ready and their IP Addresses should be printed as outputs.
+After the terraform scripts are completed, the nodes are now ready and their NAT interfaces' IP addresses should be printed as outputs.
 
 Another way to get the IP Addresses of the cluster:
 ```
 $ sudo virsh net-dhcp-leases default
  ...
  ...
- 2024-04-29 01:46:06   52:54:00:1e:22:be   ipv4       192.168.122.142/24   worker-node-02     ff:b5:5e:67:ff:00:02:00:00:ab:11:72:15:6c:42:91:6e:d7:7d
- 2024-04-29 01:46:06   52:54:00:22:8f:a3   ipv4       192.168.122.125/24   worker-node-01     ff:b5:5e:67:ff:00:02:00:00:ab:11:af:77:f4:9e:c0:66:93:d0
- 2024-04-29 01:46:01   52:54:00:ae:c3:83   ipv4       192.168.122.141/24   control-plane-01   ff:b5:5e:67:ff:00:02:00:00:ab:11:7e:fe:c7:51:90:74:f9:35
+ 2024-04-29 01:46:06   52:54:00:1e:22:be   ipv4       192.168.122.142/24   worker-node-02
+ 2024-04-29 01:46:06   52:54:00:22:8f:a3   ipv4       192.168.122.125/24   worker-node-01
+ 2024-04-29 01:46:01   52:54:00:ae:c3:83   ipv4       192.168.122.141/24   control-plane-01
  ...
  ... 
 ```
+... including some other columns that I deleted to keep it neat here.
 
-What's left? You need only to add the worker nodes to the cluster and extract the control plane's kubeconfig
+What's left? You need only to 'join' the worker nodes to the cluster and extract the control plane's kubeconfig file if you need to monitor it on the host or via Lens or another tool.
 
-SSH into the control plane and run
+SSH into the control plane with the SSH Keypair created initially. Then run:
 ```
 $ sudo kubeadm token create --print-join-command
 kubeadm join <CONTROL_PLANE_IP>:6443 --token <TOKEN> --discovery-token-ca-cert-hash sha256:<TOKEN_HASH> 
