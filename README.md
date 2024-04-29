@@ -1,37 +1,37 @@
-# Install pre-reqs on Host
+# Terraform a Kubernetes on an Ubuntu Host with KVM/Libvirt
 ```
 $ sudo apt-get install -y mkisofs xsltproc
 ```
 
-# Create an SSH Keypair to access cluster nodes
+## Create an SSH Keypair to access cluster nodes
 ```
 $ mkdir ssh_keys
 $ ssh-keygen -t ed25519 -f ./ssh_keys/id_ed25519
 $ chmod 0400 ./ssh_keys/*
 ```
 
-# Install KVM on Ubuntu
+## Install and configure KVM/Libvirt on Ubuntu
 https://computingforgeeks.com/install-kvm-hypervisor-on-ubuntu-linux/
 
-# Install Virt Manager on VM Host to view KVM Nodes
+## Install Virt Manager on VM Host to view KVM Nodes
 ```
 $ sudo apt install -y virt-manager
 ```
 
-# Setup KVM and KVM bridge network
+## Setup KVM and KVM bridge network
 https://askubuntu.com/questions/1412503/setting-up-a-bridge-for-host-and-vm
 
-# QEMU config change on Host to avoid AppArmor or SELinux issues
+## QEMU config change on Host to avoid AppArmor or SELinux issues
 Double check that `security_driver = "none"` is uncommented in `/etc/libvirt/qemu.conf` and issue `sudo systemctl restart libvirtd` to restart the daemon.
 
 Reference: https://github.com/dmacvicar/terraform-provider-libvirt/issues/546#issuecomment-612983090
 
 
-# Reference: Terraform, KVM, Kubernetes Setup 
+## Reference: Terraform, KVM, Kubernetes Setup 
 https://sysadminsignal.com/2023/06/22/a-pre-provisioned-kubernetes-cluster-solution-using-terraform-and-kvm
 
 
-# Reference: Create virsh storage pool named default
+## Reference: Create virsh storage pool named default
 Reference: https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/virtualization_administration_guide/sect-virtualization-storage_pools-creating-local_directories-virsh
 
 ```
@@ -62,7 +62,7 @@ Allocation:     113.77 GiB
 Available:      508.82 GiB
 ```
 
-# Run the Terraform script
+## Run the Terraform script and bring up the cluster
 ```
 $ terraform init
 $ sudo terraform plan
@@ -74,7 +74,7 @@ Modify the `main.tf` file to your heart's content to play around with the declar
 
 `sudo` should not be needed after some tinkering with KVM/libvirt config and `usermod`.
 
-# Post Terraform - Add Worker Nodes
+## Post Terraform - 'Join' The Worker Nodes
 After the terraform scripts are completed, the nodes are now ready and their NAT interfaces' IP addresses should be printed as outputs.
 
 Another way to get the IP Addresses of the cluster:
@@ -113,7 +113,7 @@ worker-node-02     Ready    <none>          2m5s    v1.28.1
 
 ```
 
-# Post Terraform - Extract the control plane node's kubeconfig
+## Post Terraform - Extract the control plane node's kubeconfig
 The command below copies the kube config from the control plane onto the current `pwd` and displays it in vscode if it exists and also as std output.
 ```
 ./config_host_kubeconfig.sh
@@ -134,7 +134,7 @@ Displaying Control Pane's Kube Config in VSCode in case you need it for Lens
 ```
 
 
-# Some caveats:
+## Note to self:
 If you run ctrl-c during apply .. 
 `Undefine` some pending domains that may remain after `$ terraform destroy`
 ```
