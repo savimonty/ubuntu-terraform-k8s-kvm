@@ -48,12 +48,12 @@ variable "cp_cpu" {
 
 variable "cp_disk" {
   type = number
-  default = 10
+  default = 30
 }
 
 variable "cp_memory" {
   type = number
-  default = 2048 #minimum 1700 MB
+  default = 4096 #minimum 1700 MB
 }
 
 # On to the worker nodes
@@ -65,12 +65,12 @@ variable "worker_cpu" {
 
 variable "worker_disk" {
   type = number
-  default = 5
+  default = 20
 }
 
 variable "worker_memory" {
   type = number
-  default = 1024
+  default = 2048
 }
 
 # Disk Pool to use
@@ -199,22 +199,21 @@ resource "null_resource" "copy_scripts_to_ctrl_plane" {
   }
 
   provisioner "file" {
-    source      = "./control_plane_config.sh"
-    destination = "/home/ubuntu/control_plane_config.sh"
+    source      = "./configure_control_plane.sh"
+    destination = "/home/ubuntu/configure_control_plane.sh"
   }
 
   provisioner "remote-exec" {
     inline = [
       "cd /home/ubuntu && chmod +x ./install_k8s.sh && ./install_k8s.sh",
-      "cd /home/ubuntu && chmod +x ./control_plane_config.sh && ./control_plane_config.sh",
+      "cd /home/ubuntu && chmod +x ./configure_control_plane.sh && ./configure_control_plane.sh",
     ]
   }
-
 
   depends_on = [module.controlplane]
 }
 
-resource "null_resource" "copy_scripts_to_worker_1" {
+resource "null_resource" "copy_scripts_to_workers_1" {
   connection {
     host     = "${module.worker.ip_address[0]}"
     type     = "ssh"
@@ -234,7 +233,7 @@ resource "null_resource" "copy_scripts_to_worker_1" {
     ]
   }
 
-  depends_on = [module.worker[0]]
+  depends_on = [null_resource.copy_scripts_to_ctrl_plane, module.worker[0]]
 }
 
 resource "null_resource" "copy_scripts_to_worker_2" {
@@ -257,6 +256,5 @@ resource "null_resource" "copy_scripts_to_worker_2" {
     ]
   }
 
-  depends_on = [module.worker]
+  depends_on = [null_resource.copy_scripts_to_ctrl_plane, module.worker[1]]
 }
-

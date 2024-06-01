@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 sudo apt update
 sudo apt remove docker docker.io containerd runc
 
@@ -8,7 +10,7 @@ sudo apt install -y ca-certificates curl gnupg
 
 # Add the Docker repository GPG keys
 sudo install -m 0755 -d /etc/apt/keyrings
-sudo sh -c 'curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg'
+sudo sh -c 'curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --yes --dearmor -o /etc/apt/keyrings/docker.gpg'
 sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
 # Add Docker repository
@@ -86,10 +88,10 @@ sudo sysctl --system
 
 #### NODE CONFIG COMPLETE 
 
-# Install K8s: 1.28.1
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+# Install K8s: 1.28
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --yes --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo chmod 644 /etc/apt/sources.list.d/kubernetes.list
 sudo apt update
-sudo apt install -y kubeadm=1.28.1-1.1 kubelet=1.28.1-1.1 kubectl=1.28.1-1.1
+sudo apt install -y --allow-change-held-packages kubeadm kubelet kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
-
